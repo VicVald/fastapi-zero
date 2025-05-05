@@ -45,3 +45,57 @@ def test_read_users(client):
             }
         ]
         }
+
+
+def test_update_user(client):
+
+    response = client.put(
+        '/users/1',
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'pimpolhoflamejante31',
+        }
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'id': 1,
+    }
+
+    error_response = client.put(
+        '/users/1000',
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'pimpolhoflamejante31',
+        }
+    )
+
+    assert error_response.status_code == HTTPStatus.NOT_FOUND
+    assert error_response.json() == {
+            'detail': 'User not found'
+    }
+
+
+def test_delete_user(client):
+
+    response = client.delete(
+        'users/1'
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {
+        'message': 'User Deleted'
+    }
+
+    error_response = client.delete(
+        'users/1'
+    )
+
+    assert error_response.status_code == HTTPStatus.NOT_FOUND
+    assert error_response.json() == {
+            'detail': 'User not found'
+    }
