@@ -1,23 +1,47 @@
 from http import HTTPStatus
 
-from fastapi.testclient import TestClient
 
-from project_1.app import app
+def test_root_deve_retornar_ok_e_ola_mundo(client):
 
-client = TestClient(app)
+    response = client.get('/')
 
-def test_root_deve_retornar_ok_e_ola_mundo():  
+    assert response.status_code == HTTPStatus.OK
 
-
-    client = TestClient(app)  
+    assert response.json() == {'message': 'Olá Mundo!'}
 
 
+def test_create_user(client):
 
-    response = client.get('/')  
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'alice',
+            'email': 'alice@example.com',
+            'password': 'secret',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+
+    assert response.json() == {
+        'username': 'alice',
+        'email': 'alice@example.com',
+        'id': 1,
+    }
 
 
+def test_read_users(client):
 
-    assert response.status_code == HTTPStatus.OK  
+    response = client.get('/users/')
 
+    assert response.status_code == HTTPStatus.OK
 
-    assert response.json() == {'message': 'Olá Mundo!'} 
+    assert response.json() == {
+        'users': [
+            {
+                'username': 'alice',
+                'email': 'alice@example.com',
+                'id': 1,
+            }
+        ]
+        }
